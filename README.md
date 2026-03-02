@@ -164,3 +164,4 @@ This project is for educational and demonstration purposes.
 ## 👥 Contributing
 
 Feel free to submit issues and enhancement requests!
+# denticon-dashboard
