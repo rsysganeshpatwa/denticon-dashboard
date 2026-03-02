@@ -3,6 +3,18 @@ import './ApiDocs.css';
 
 const ApiDocs = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState(null);
+  
+  // Dynamically get the API base URL
+  const getApiBaseUrl = () => {
+    // If running in development, use localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:3001';
+    }
+    // In production, use the current host with /api path
+    return `${window.location.protocol}//${window.location.host}`;
+  };
+  
+  const apiBaseUrl = getApiBaseUrl();
 
   const apiEndpoints = [
     {
@@ -325,7 +337,7 @@ const ApiDocs = () => {
           <h4>Try it out</h4>
           <div className="curl-example">
             <pre className="code-block">
-{`curl -X ${endpoint.method} 'http://localhost:3001${endpoint.path}' \\
+{`curl -X ${endpoint.method} '${apiBaseUrl}${endpoint.path}' \\
 ${endpoint.headers.map(h => `  -H "${h.name}: ${h.value}"`).join(' \\\n')}${endpoint.body ? ' \\\n  -H "Content-Type: application/json" \\\n  -d \'' + JSON.stringify(endpoint.body, null, 2) + '\'' : ''}`}
             </pre>
           </div>
@@ -340,7 +352,7 @@ ${endpoint.headers.map(h => `  -H "${h.name}: ${h.value}"`).join(' \\\n')}${endp
         <h1>🔌 API Documentation</h1>
         <p>Complete REST API reference for Denticon Healthcare Management System</p>
         <div className="base-url">
-          <strong>Base URL:</strong> <code>http://localhost:3001</code>
+          <strong>Base URL:</strong> <code>{apiBaseUrl}</code>
         </div>
       </div>
 
@@ -389,7 +401,7 @@ ${endpoint.headers.map(h => `  -H "${h.name}: ${h.value}"`).join(' \\\n')}${endp
                   <li>All API requests require authentication headers</li>
                   <li>Use the provided VendorKey, ClientKey, and Pgid in your requests</li>
                   <li>The API returns JSON formatted responses</li>
-                  <li>Base URL: <code>http://localhost:3001</code></li>
+                  <li>Base URL: <code>{apiBaseUrl}</code></li>
                 </ol>
               </div>
 
