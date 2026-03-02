@@ -1,0 +1,422 @@
+import React, { useState } from 'react';
+import './ApiDocs.css';
+
+const ApiDocs = () => {
+  const [selectedEndpoint, setSelectedEndpoint] = useState(null);
+
+  const apiEndpoints = [
+    {
+      category: 'Patient Management',
+      endpoints: [
+        {
+          name: 'Get All Patients',
+          method: 'GET',
+          path: '/api/Patient',
+          description: 'Retrieve a list of all patients with pagination support',
+          headers: [
+            { name: 'VendorKey', value: 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7', required: true },
+            { name: 'ClientKey', value: 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB', required: true },
+            { name: 'Pgid', value: '1', required: true }
+          ],
+          queryParams: [
+            { name: 'Page', type: 'number', default: '1', description: 'Page number for pagination' },
+            { name: 'Count', type: 'number', default: '10', description: 'Number of records per page' },
+            { name: 'IncludeInactive', type: 'boolean', default: 'false', description: 'Include inactive patients' }
+          ],
+          response: {
+            statusCode: 200,
+            data: [
+              {
+                id: 1,
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                phone: '555-0101',
+                dateOfBirth: '1980-05-15',
+                isActive: true,
+                primaryProviderId: 1,
+                lastVisit: '2024-02-15',
+                insuranceProvider: 'Blue Cross'
+              }
+            ],
+            pagination: {
+              page: 1,
+              count: 10,
+              total: 8,
+              totalPages: 1
+            }
+          }
+        },
+        {
+          name: 'Get Patient by ID',
+          method: 'GET',
+          path: '/api/Patient/:id',
+          description: 'Retrieve a specific patient by their ID',
+          headers: [
+            { name: 'VendorKey', value: 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7', required: true },
+            { name: 'ClientKey', value: 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB', required: true },
+            { name: 'Pgid', value: '1', required: true }
+          ],
+          pathParams: [
+            { name: 'id', type: 'number', description: 'Patient ID' }
+          ],
+          response: {
+            statusCode: 200,
+            data: {
+              id: 1,
+              firstName: 'John',
+              lastName: 'Doe',
+              email: 'john.doe@example.com',
+              phone: '555-0101',
+              isActive: true
+            }
+          }
+        },
+        {
+          name: 'Create Patient',
+          method: 'POST',
+          path: '/api/Patient',
+          description: 'Create a new patient record',
+          headers: [
+            { name: 'VendorKey', value: 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7', required: true },
+            { name: 'ClientKey', value: 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB', required: true },
+            { name: 'Pgid', value: '1', required: true },
+            { name: 'Content-Type', value: 'application/json', required: true }
+          ],
+          body: {
+            firstName: 'Jane',
+            lastName: 'Smith',
+            email: 'jane@example.com',
+            phone: '555-0102',
+            dateOfBirth: '1990-03-20',
+            address: '123 Main St',
+            city: 'San Francisco',
+            state: 'CA',
+            zipCode: '94105'
+          },
+          response: {
+            statusCode: 201,
+            message: 'Patient created successfully',
+            data: {
+              id: 9,
+              firstName: 'Jane',
+              lastName: 'Smith',
+              isActive: true
+            }
+          }
+        }
+      ]
+    },
+    {
+      category: 'Appointment Management',
+      endpoints: [
+        {
+          name: 'Get All Appointments',
+          method: 'GET',
+          path: '/api/Appointment',
+          description: 'Retrieve all appointments with patient and provider details',
+          headers: [
+            { name: 'VendorKey', value: 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7', required: true },
+            { name: 'ClientKey', value: 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB', required: true },
+            { name: 'Pgid', value: '1', required: true }
+          ],
+          queryParams: [
+            { name: 'Page', type: 'number', default: '1', description: 'Page number' },
+            { name: 'Count', type: 'number', default: '10', description: 'Records per page' },
+            { name: 'Status', type: 'string', default: '', description: 'Filter by status (Scheduled, Completed, Cancelled)' }
+          ],
+          response: {
+            statusCode: 200,
+            data: [
+              {
+                id: 1,
+                patientId: 1,
+                providerId: 1,
+                patientName: 'John Doe',
+                providerName: 'Dr. Sarah Williams',
+                appointmentDate: '2026-03-05',
+                appointmentTime: '10:00',
+                duration: 60,
+                type: 'Cleaning',
+                status: 'Scheduled',
+                room: '101',
+                notes: 'Regular checkup and cleaning'
+              }
+            ]
+          }
+        },
+        {
+          name: 'Create Appointment',
+          method: 'POST',
+          path: '/api/Appointment',
+          description: 'Schedule a new appointment',
+          headers: [
+            { name: 'VendorKey', value: 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7', required: true },
+            { name: 'ClientKey', value: 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB', required: true },
+            { name: 'Pgid', value: '1', required: true },
+            { name: 'Content-Type', value: 'application/json', required: true }
+          ],
+          body: {
+            patientId: 1,
+            providerId: 1,
+            appointmentDate: '2026-03-15',
+            appointmentTime: '14:00',
+            duration: 60,
+            type: 'Consultation',
+            status: 'Scheduled',
+            notes: 'Initial consultation'
+          },
+          response: {
+            statusCode: 201,
+            message: 'Appointment created successfully',
+            data: {
+              id: 13,
+              patientId: 1,
+              providerId: 1,
+              appointmentDate: '2026-03-15',
+              status: 'Scheduled'
+            }
+          }
+        }
+      ]
+    },
+    {
+      category: 'Provider Management',
+      endpoints: [
+        {
+          name: 'Get All Providers',
+          method: 'GET',
+          path: '/api/Provider',
+          description: 'Retrieve all healthcare providers with statistics',
+          headers: [
+            { name: 'VendorKey', value: 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7', required: true },
+            { name: 'ClientKey', value: 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB', required: true },
+            { name: 'Pgid', value: '1', required: true }
+          ],
+          queryParams: [
+            { name: 'Page', type: 'number', default: '1', description: 'Page number' },
+            { name: 'Count', type: 'number', default: '10', description: 'Records per page' },
+            { name: 'IncludeInactive', type: 'boolean', default: 'false', description: 'Include inactive providers' }
+          ],
+          response: {
+            statusCode: 200,
+            data: [
+              {
+                id: 1,
+                firstName: 'Dr. Sarah',
+                lastName: 'Williams',
+                title: 'DDS',
+                specialty: 'General Dentistry',
+                email: 'sarah.williams@dental.com',
+                phone: '555-0201',
+                isActive: true,
+                patientsCount: 45,
+                appointmentsCount: 23,
+                rating: 4.8,
+                experience: '15 years',
+                education: 'UCLA School of Dentistry'
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      category: 'Practice Locations',
+      endpoints: [
+        {
+          name: 'Get All Locations',
+          method: 'GET',
+          path: '/api/Practice',
+          description: 'Retrieve all practice locations',
+          headers: [
+            { name: 'VendorKey', value: 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7', required: true },
+            { name: 'ClientKey', value: 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB', required: true },
+            { name: 'Pgid', value: '1', required: true }
+          ],
+          response: {
+            statusCode: 200,
+            data: [
+              {
+                id: 1,
+                name: 'Downtown Dental Center',
+                address: '123 Main St',
+                city: 'San Francisco',
+                state: 'CA',
+                zipCode: '94105',
+                phone: '555-0100',
+                email: 'info@downtowndental.com',
+                isActive: true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ];
+
+  const renderEndpointDetails = (endpoint) => {
+    return (
+      <div className="endpoint-details">
+        <div className="endpoint-header">
+          <span className={`method-badge ${endpoint.method.toLowerCase()}`}>{endpoint.method}</span>
+          <code className="endpoint-path">{endpoint.path}</code>
+        </div>
+        
+        <p className="endpoint-description">{endpoint.description}</p>
+
+        <div className="section">
+          <h4>Required Headers</h4>
+          <div className="headers-table">
+            {endpoint.headers.map((header, idx) => (
+              <div key={idx} className="header-row">
+                <span className="header-name">{header.name}</span>
+                <code className="header-value">{header.value}</code>
+                {header.required && <span className="required-badge">Required</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {endpoint.pathParams && (
+          <div className="section">
+            <h4>Path Parameters</h4>
+            <div className="params-table">
+              {endpoint.pathParams.map((param, idx) => (
+                <div key={idx} className="param-row">
+                  <span className="param-name">{param.name}</span>
+                  <span className="param-type">{param.type}</span>
+                  <span className="param-desc">{param.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {endpoint.queryParams && (
+          <div className="section">
+            <h4>Query Parameters</h4>
+            <div className="params-table">
+              {endpoint.queryParams.map((param, idx) => (
+                <div key={idx} className="param-row">
+                  <span className="param-name">{param.name}</span>
+                  <span className="param-type">{param.type}</span>
+                  <span className="param-default">default: {param.default}</span>
+                  <span className="param-desc">{param.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {endpoint.body && (
+          <div className="section">
+            <h4>Request Body</h4>
+            <pre className="code-block">{JSON.stringify(endpoint.body, null, 2)}</pre>
+          </div>
+        )}
+
+        <div className="section">
+          <h4>Response</h4>
+          <pre className="code-block">{JSON.stringify(endpoint.response, null, 2)}</pre>
+        </div>
+
+        <div className="section">
+          <h4>Try it out</h4>
+          <div className="curl-example">
+            <pre className="code-block">
+{`curl -X ${endpoint.method} 'http://localhost:3001${endpoint.path}' \\
+${endpoint.headers.map(h => `  -H "${h.name}: ${h.value}"`).join(' \\\n')}${endpoint.body ? ' \\\n  -H "Content-Type: application/json" \\\n  -d \'' + JSON.stringify(endpoint.body, null, 2) + '\'' : ''}`}
+            </pre>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="api-docs">
+      <div className="docs-header">
+        <h1>🔌 API Documentation</h1>
+        <p>Complete REST API reference for Denticon Healthcare Management System</p>
+        <div className="base-url">
+          <strong>Base URL:</strong> <code>http://localhost:3001</code>
+        </div>
+      </div>
+
+      <div className="docs-content">
+        <div className="api-docs-sidebar">
+          <div className="api-docs-sidebar-section">
+            <h3>Authentication</h3>
+            <p className="auth-note">All endpoints require authentication headers</p>
+          </div>
+
+          {apiEndpoints.map((category, catIdx) => (
+            <div key={catIdx} className="api-docs-sidebar-section">
+              <h3>{category.category}</h3>
+              <ul className="endpoint-list">
+                {category.endpoints.map((endpoint, epIdx) => (
+                  <li 
+                    key={epIdx}
+                    className={selectedEndpoint === `${catIdx}-${epIdx}` ? 'active' : ''}
+                    onClick={() => setSelectedEndpoint(`${catIdx}-${epIdx}`)}
+                  >
+                    <span className={`method-tag ${endpoint.method.toLowerCase()}`}>
+                      {endpoint.method}
+                    </span>
+                    {endpoint.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="main-content">
+          {selectedEndpoint ? (
+            renderEndpointDetails(
+              apiEndpoints[parseInt(selectedEndpoint.split('-')[0])]
+                .endpoints[parseInt(selectedEndpoint.split('-')[1])]
+            )
+          ) : (
+            <div className="welcome-section">
+              <h2>Welcome to Denticon API Documentation</h2>
+              <p>Select an endpoint from the left sidebar to view detailed documentation.</p>
+              
+              <div className="quick-start">
+                <h3>Quick Start</h3>
+                <ol>
+                  <li>All API requests require authentication headers</li>
+                  <li>Use the provided VendorKey, ClientKey, and Pgid in your requests</li>
+                  <li>The API returns JSON formatted responses</li>
+                  <li>Base URL: <code>http://localhost:3001</code></li>
+                </ol>
+              </div>
+
+              <div className="features-grid">
+                <div className="feature-card">
+                  <h4>👥 Patient Management</h4>
+                  <p>Create, read, update patient records with full details</p>
+                </div>
+                <div className="feature-card">
+                  <h4>📅 Appointments</h4>
+                  <p>Schedule and manage patient appointments with providers</p>
+                </div>
+                <div className="feature-card">
+                  <h4>👨‍⚕️ Providers</h4>
+                  <p>Manage healthcare providers and their specialties</p>
+                </div>
+                <div className="feature-card">
+                  <h4>📍 Locations</h4>
+                  <p>Practice location information and management</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ApiDocs;

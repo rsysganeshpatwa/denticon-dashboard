@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  denticon-api:
+    build:
+      context: ./denticon-api-node
+      dockerfile: Dockerfile
+    container_name: denticon-api
+    restart: unless-stopped
+    expose:
+      - "3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    networks:
+      - denticon-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend React Service
+  denticon-dashboard:
+    build:
+      context: ./denticon-dashboard
+      dockerfile: Dockerfile
+    container_name: denticon-dashboard
+    restart: unless-stopped
+    expose:
+      - "3000"
+    depends_on:
+      - denticon-api
+    networks:
+      - denticon-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx Reverse Proxy
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: denticon-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - denticon-api
+      - denticon-dashboard
+    networks:
+      - denticon-network
+    volumes:
+      - ./nginx/logs:/var/log/nginx
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  denticon-network:
+    driver: bridge
+
+volumes:
+  api-data:
