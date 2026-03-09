@@ -112,9 +112,18 @@
 }
 
 .apt-time {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-weight: 600;
   color: #667eea;
-  min-width: 80px;
+  min-width: 100px;
+}
+
+.apt-time small {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
 }
 
 .apt-details {
@@ -179,10 +188,29 @@
   cursor: pointer;
   transition: all 0.3s;
   color: white;
+  text-align: left;
 }
 
 .action-btn span {
-  font-size: 24px;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.action-btn .action-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.action-btn .action-info strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.action-btn .action-info small {
+  font-size: 13px;
+  opacity: 0.9;
+  font-weight: 400;
 }
 
 .action-btn.primary {
@@ -190,15 +218,15 @@
 }
 
 .action-btn.secondary {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-}
-
-.action-btn.tertiary {
   background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
 }
 
+.action-btn.tertiary {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
 .action-btn.quaternary {
-  background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
 }
 
 .action-btn:hover {

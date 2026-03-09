@@ -35,9 +35,20 @@
   text-align: center;
 }
 
-.logo {
+.login-icon {
   font-size: 60px;
   margin-bottom: 15px;
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .login-header h1 {
@@ -60,7 +71,9 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
   margin-bottom: 8px;
   color: #333;
@@ -83,34 +96,15 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
+.error-message {
+  padding: 12px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  color: #c33;
+  margin-bottom: 20px;
   font-size: 14px;
-  color: #666;
-}
-
-.remember-me input {
-  margin-right: 8px;
-}
-
-.forgot-password {
-  color: #667eea;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.forgot-password:hover {
-  text-decoration: underline;
+  text-align: center;
 }
 
 .login-btn {
@@ -126,9 +120,14 @@
   transition: all 0.3s ease;
 }
 
-.login-btn:hover {
+.login-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .demo-credentials {
@@ -136,7 +135,52 @@
   padding: 20px;
   background: #f8f9ff;
   border-radius: 10px;
-  text-align: center;
+}
+
+.demo-credentials strong {
+  display: block;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 15px;
+}
+
+.credential-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: white;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.credential-item:last-child {
+  margin-bottom: 0;
+}
+
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.role-badge.admin {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.role-badge.provider {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.role-badge.frontdesk {
+  background: #e8f5e9;
+  color: #388e3c;
 }
 
 .demo-credentials p {

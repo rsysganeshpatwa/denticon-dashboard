@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './EditForm.css';
 
-const EditPatient = ({ patientId, onClose, onSave }) => {
+const EditPatient = ({ patient, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -14,6 +14,24 @@ const EditPatient = ({ patientId, onClose, onSave }) => {
     zipCode: '',
     insuranceProvider: ''
   });
+
+  useEffect(() => {
+    if (patient) {
+      // Populate form with existing patient data
+      setFormData({
+        firstName: patient.first_name || '',
+        lastName: patient.last_name || '',
+        email: patient.email || '',
+        phone: patient.phone || '',
+        dateOfBirth: patient.date_of_birth ? patient.date_of_birth.split('T')[0] : '',
+        address: patient.address || '',
+        city: patient.city || '',
+        state: patient.state || '',
+        zipCode: patient.zip_code || '',
+        insuranceProvider: patient.insurance_provider || ''
+      });
+    }
+  }, [patient]);
 
   const handleChange = (e) => {
     setFormData({
@@ -31,7 +49,7 @@ const EditPatient = ({ patientId, onClose, onSave }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>{patientId ? 'Edit Patient' : 'Add New Patient'}</h2>
+          <h2>{patient ? 'Edit Patient' : 'Add New Patient'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 

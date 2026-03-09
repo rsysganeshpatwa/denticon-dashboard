@@ -3,6 +3,12 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
+// Load database configuration
+const { pool } = require('./config/database');
+
+// Load authentication middleware
+const { verifyToken, adminOnly, adminOrFrontDesk, adminOrProvider } = require('./middleware/auth');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -11,59 +17,51 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Custom authentication middleware
-const authenticate = (req, res, next) => {
-  const vendorKey = req.headers['vendorkey'] || req.headers['VendorKey'];
-  const clientKey = req.headers['clientkey'] || req.headers['ClientKey'];
-  const pgid = req.headers['pgid'] || req.headers['Pgid'];
-
-  // Mock authentication - replace with real logic
-  const validVendorKey = 'BCF756D4-DCE6-4F2B-BAAE-7679D87037A7';
-  const validClientKey = 'AAC6DB7A-5A66-4EBC-B694-D6BCD99881CB';
-
-  if (!vendorKey || !clientKey || !pgid) {
-    return res.status(401).json({
-      statusCode: 401,
-      message: 'Missing authentication headers'
-    });
-  }
-
-  if (vendorKey !== validVendorKey || clientKey !== validClientKey) {
-    return res.status(401).json({
-      statusCode: 401,
-      message: 'Request is not authorized.'
-    });
-  }
-
-  req.pgid = pgid;
-  next();
-};
-
 // Routes
+const authRoutes = require('./routes/auth');
 const patientRoutes = require('./routes/patients');
 const providerRoutes = require('./routes/providers');
 const appointmentRoutes = require('./routes/appointments');
 const practiceRoutes = require('./routes/practice');
+const locationRoutes = require('./routes/locations');
+const appointmentRequestRoutes = require('./routes/appointmentRequests');
+const providerPortalRoutes = require('./routes/provider');
 
 // API base route
 app.get('/api', (req, res) => {
   res.json({
-    message: 'Denticon-style API',
-    version: '1.0.0',
+    message: 'Denticon-style API with JWT Authentication',
+    version: '2.0.0',
     endpoints: {
+      auth: '/api/auth',
       patients: '/api/Patient',
       providers: '/api/Provider',
       appointments: '/api/Appointment',
-      practice: '/api/Practice'
+      practice: '/api/Practice',
+      locations: '/api/Location',
+      appointmentRequests: '/api/AppointmentRequest',
+      providerPortal: '/api/provider-portal'
     }
   });
 });
 
-// Apply authentication to all /api routes
-app.use('/api/Patient', authenticate, patientRoutes);
-app.use('/api/Provider', authenticate, providerRoutes);
-app.use('/api/Appointment', authenticate, appointmentRoutes);
-app.use('/api/Practice', authenticate, practiceRoutes);
+// Public routes (no authentication required)
+app.use('/api/auth', authRoutes); // Login, verify, logout
+app.use('/api/AppointmentRequest', appointmentRequestRoutes); // Public appointment booking
+
+// Public access to locations and providers (for appointment booking)
+app.use('/api/public/locations', locationRoutes); // Public can view locations
+app.use('/api/public/providers', providerRoutes); // Public can view providers
+
+// Protected routes (require JWT authentication)
+app.use('/api/Location', verifyToken, locationRoutes); // All authenticated users
+app.use('/api/Patient', verifyToken, adminOrFrontDesk, patientRoutes); // Admin and Front Desk only
+app.use('/api/Provider', verifyToken, adminOnly, providerRoutes); // Admin only (CRUD on provider records)
+app.use('/api/Appointment', verifyToken, adminOrFrontDesk, appointmentRoutes); // Admin and Front Desk
+app.use('/api/Practice', verifyToken, adminOnly, practiceRoutes); // Admin only
+
+// Provider Portal routes (provider-specific) - AFTER admin routes
+app.use('/api/provider-portal', providerPortalRoutes); // Has its own middleware inside
 
 // Error handling
 app.use((err, req, res, next) => {
@@ -92,9 +90,18 @@ function generateActivityId() {
   });
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Denticon API Server running on http://localhost:${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
+  
+  // Test database connection
+  try {
+    const result = await pool.query('SELECT NOW()');
+    console.log(`✅ Database connected successfully at ${result.rows[0].now}`);
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+    console.error('⚠️  Server is running but database operations will fail');
+  }
 });
 
 module.exports = app;
