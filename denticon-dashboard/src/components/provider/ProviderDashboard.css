@@ -232,6 +232,104 @@
   color: #7f8c8d;
 }
 
+/* Follow-up Styles */
+.follow-up-stat {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-left: 4px solid #f39c12;
+}
+
+.follow-up-stat .stat-icon {
+  background: rgba(243, 156, 18, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.follow-up-section {
+  border-left: 4px solid #f39c12;
+}
+
+.follow-up-badge {
+  font-size: 24px;
+  margin-right: 8px;
+  animation: ring 3s ease-in-out infinite;
+}
+
+@keyframes ring {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30% {
+    transform: rotate(-10deg);
+  }
+  20%, 40% {
+    transform: rotate(10deg);
+  }
+}
+
+.info-box {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 4px solid #2196f3;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.info-box p {
+  margin: 0;
+  color: #1565c0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.provider-appointment-card.follow-up-required {
+  border: 2px solid #f39c12;
+  background: linear-gradient(135deg, #fffbea 0%, #fff8dc 100%);
+}
+
+.provider-appointment-card.follow-up-required:hover {
+  border-color: #e67e22;
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2);
+}
+
+.clickable-appointment {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clickable-appointment:hover {
+  transform: translateX(5px);
+}
+
+.appointment-time .date {
+  display: block;
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-top: 4px;
+}
+
+.status-follow-up {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr;

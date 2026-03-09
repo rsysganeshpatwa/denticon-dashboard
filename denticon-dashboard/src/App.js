@@ -13,6 +13,7 @@ import Appointments from './components/admin/Appointments';
 import Providers from './components/admin/Providers';
 import Locations from './components/admin/Locations';
 import ApiDocs from './components/admin/ApiDocs';
+import UserManual from './components/admin/UserManual';
 import AppointmentRequests from './components/admin/AppointmentRequests';
 
 // Provider Components
@@ -120,6 +121,7 @@ function App() {
         {/* Public Routes - No Login Required */}
         <Route path="/book-appointment" element={<PublicAppointmentForm />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/public/user-manual" element={<UserManual />} />
 
         {/* Protected Routes - Login Required */}
         <Route path="/dashboard" element={
@@ -155,6 +157,11 @@ function App() {
         <Route path="/api-docs" element={
           <ProtectedLayout isLoggedIn={isLoggedIn} activeTab={activeTab} setActiveTab={setActiveTab} handleLogout={handleLogout} user={user}>
             <ApiDocs />
+          </ProtectedLayout>
+        } />
+        <Route path="/user-manual" element={
+          <ProtectedLayout isLoggedIn={isLoggedIn} activeTab={activeTab} setActiveTab={setActiveTab} handleLogout={handleLogout} user={user}>
+            <UserManual />
           </ProtectedLayout>
         } />
         <Route path="/share-link" element={

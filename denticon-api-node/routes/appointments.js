@@ -207,15 +207,15 @@ router.post('/', async (req, res) => {
     
     try {
         const {
-            patient_id, provider_id, location_id,
+            patient_id, provider_id,
             appointment_date, appointment_time,
-            appointment_type, notes
+            appointment_type, notes, status
         } = req.body;
         
-        if (!patient_id || !provider_id || !location_id || !appointment_date || !appointment_time) {
+        if (!patient_id || !provider_id || !appointment_date || !appointment_time) {
             return res.status(400).json({ 
                 statusCode: 400, 
-                message: 'Patient, provider, location, date, and time are required' 
+                message: 'Patient, provider, date, and time are required' 
             });
         }
         
@@ -238,18 +238,19 @@ router.post('/', async (req, res) => {
             });
         }
         
-        // Create appointment
+        // Create appointment (location_id removed - determined via provider)
         const result = await client.query(`
             INSERT INTO appointments (
-                patient_id, provider_id, location_id,
+                patient_id, provider_id,
                 appointment_date, appointment_time,
                 appointment_type, notes, status
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'scheduled')
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *
         `, [
-            patient_id, provider_id, location_id,
+            patient_id, provider_id,
             appointment_date, appointment_time,
-            appointment_type, notes
+            appointment_type || 'checkup', // Default to 'checkup' if not provided
+            notes, status || 'scheduled'
         ]);
         
         await client.query('COMMIT');

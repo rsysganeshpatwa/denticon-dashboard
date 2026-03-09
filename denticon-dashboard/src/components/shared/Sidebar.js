@@ -105,6 +105,13 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           <span className="nav-icon">🔌</span>
           <span className="nav-label">API Docs</span>
         </div>
+        <div 
+          className={`nav-item ${activeTab === 'user-manual' ? 'active' : ''}`}
+          onClick={() => handleNavigation({ id: 'user-manual', path: '/user-manual' })}
+        >
+          <span className="nav-icon">📖</span>
+          <span className="nav-label">User Manual</span>
+        </div>
         <div className="nav-item">
           <span className="nav-icon">⚙️</span>
           <span className="nav-label">Settings</span>

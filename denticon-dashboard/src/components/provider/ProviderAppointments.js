@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import api from '../../services/api';
 import '../admin/Appointments.css';
 
@@ -10,12 +12,34 @@ function ProviderAppointments() {
   const [completeFormData, setCompleteFormData] = useState({
     diagnosis: '',
     treatment: '',
-    notes: ''
+    notes: '',
+    follow_up_required: false,
+    next_visit_date: '',
+    follow_up_notes: ''
   });
   const [filters, setFilters] = useState({
     date: '',
-    status: ''
+    status: '',
+    patient_search: ''
   });
+  const [highlightedPatientId, setHighlightedPatientId] = useState(null);
+
+  useEffect(() => {
+    // Check if there's a highlighted patient from dashboard
+    const storedPatient = localStorage.getItem('highlightedPatient');
+    if (storedPatient) {
+      try {
+        const patientInfo = JSON.parse(storedPatient);
+        setHighlightedPatientId(patientInfo.id);
+        setFilters(prev => ({ ...prev, patient_search: patientInfo.name }));
+        // Clear the stored patient after setting the filter
+        localStorage.removeItem('highlightedPatient');
+      } catch (error) {
+        console.error('Error parsing patient info:', error);
+        localStorage.removeItem('highlightedPatient');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     fetchAppointments();
@@ -32,7 +56,18 @@ function ProviderAppointments() {
       const response = await api.get(url);
       
       if (response.data && response.data.data) {
-        setAppointments(response.data.data);
+        let filteredData = response.data.data;
+        
+        // Client-side filtering for patient search
+        if (filters.patient_search) {
+          const searchLower = filters.patient_search.toLowerCase();
+          filteredData = filteredData.filter(apt => 
+            apt.patient_name?.toLowerCase().includes(searchLower) ||
+            apt.patient_id?.toString().includes(searchLower)
+          );
+        }
+        
+        setAppointments(filteredData);
       }
     } catch (error) {
       console.error('Error fetching appointments:', error);
@@ -62,7 +97,10 @@ function ProviderAppointments() {
     setCompleteFormData({
       diagnosis: '',
       treatment: '',
-      notes: ''
+      notes: '',
+      follow_up_required: false,
+      next_visit_date: '',
+      follow_up_notes: ''
     });
   };
 
@@ -84,12 +122,15 @@ function ProviderAppointments() {
 
     try {
       setLoading(true);
-      // Update appointment with diagnosis, treatment, and notes
+      // Update appointment with diagnosis, treatment, notes, and follow-up data
       await api.put(`/provider-portal/appointments/${selectedAppointment.id}`, {
         diagnosis: completeFormData.diagnosis,
         treatment: completeFormData.treatment,
         notes: completeFormData.notes,
-        status: 'completed'
+        status: 'completed',
+        follow_up_required: completeFormData.follow_up_required,
+        next_visit_date: completeFormData.follow_up_required ? completeFormData.next_visit_date : null,
+        follow_up_notes: completeFormData.follow_up_required ? completeFormData.follow_up_notes : null
       });
       alert('Appointment completed successfully!');
       handleCompleteModalClose();
@@ -177,16 +218,83 @@ function ProviderAppointments() {
             <option value="no-show">No Show</option>
           </select>
         </div>
+        <div className="filter-group">
+          <label>Search Patient:</label>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <input
+              type="text"
+              name="patient_search"
+              value={filters.patient_search}
+              onChange={handleFilterChange}
+              placeholder="Patient name or ID"
+              style={{ paddingRight: filters.patient_search ? '35px' : '10px' }}
+            />
+            {filters.patient_search && (
+              <button
+                onClick={() => {
+                  setFilters(prev => ({ ...prev, patient_search: '' }));
+                  setHighlightedPatientId(null);
+                }}
+                className="clear-search-btn"
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  color: '#999',
+                  padding: '0 5px'
+                }}
+                title="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
         <button className="btn-refresh" onClick={fetchAppointments}>
           🔄 Refresh
         </button>
       </div>
 
+      {/* Filter Active Banner */}
+      {filters.patient_search && (
+        <div className="filter-active-banner">
+          <span>Showing appointments for: <strong>{filters.patient_search}</strong></span>
+          <button 
+            className="clear-filter-btn"
+            onClick={() => {
+              setFilters(prev => ({ ...prev, patient_search: '' }));
+              setHighlightedPatientId(null);
+            }}
+          >
+            Clear Filter
+          </button>
+        </div>
+      )}
+
       {/* Appointments List */}
       <div className="appointments-list">
         {appointments.length === 0 ? (
           <div className="no-data">
-            <p>No appointments found</p>
+            {filters.patient_search ? (
+              <>
+                <p>No appointments found for "{filters.patient_search}"</p>
+                <button 
+                  className="clear-filter-btn"
+                  onClick={() => {
+                    setFilters(prev => ({ ...prev, patient_search: '' }));
+                    setHighlightedPatientId(null);
+                  }}
+                  style={{ marginTop: '10px' }}
+                >
+                  Clear Search
+                </button>
+              </>
+            ) : (
+              <p>No appointments found</p>
+            )}
           </div>
         ) : (
           <table className="appointments-table">
@@ -203,7 +311,15 @@ function ProviderAppointments() {
             </thead>
             <tbody>
               {appointments.map((apt) => (
-                <tr key={apt.id}>
+                <tr 
+                  key={apt.id}
+                  className={highlightedPatientId === apt.patient_id ? 'highlighted-row' : ''}
+                  style={highlightedPatientId === apt.patient_id ? {
+                    backgroundColor: '#fff9e6',
+                    boxShadow: '0 0 0 2px #f39c12',
+                    animation: 'highlight-fade 2s ease-in-out'
+                  } : {}}
+                >
                   <td>{formatDate(apt.appointment_date)}</td>
                   <td className="time-cell">{formatTime(apt.appointment_time)}</td>
                   <td>
@@ -314,6 +430,64 @@ function ProviderAppointments() {
                     className="edit-input"
                   />
                 </label>
+              </div>
+              
+              {/* Follow-up Section */}
+              <div className="form-group" style={{ 
+                borderTop: '2px solid #e0e0e0', 
+                paddingTop: '1.5rem', 
+                marginTop: '1.5rem' 
+              }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <input
+                    type="checkbox"
+                    name="follow_up_required"
+                    checked={completeFormData.follow_up_required}
+                    onChange={(e) => setCompleteFormData({
+                      ...completeFormData,
+                      follow_up_required: e.target.checked,
+                      next_visit_date: e.target.checked ? completeFormData.next_visit_date : '',
+                      follow_up_notes: e.target.checked ? completeFormData.follow_up_notes : ''
+                    })}
+                    style={{ width: 'auto', cursor: 'pointer' }}
+                  />
+                  <strong style={{ color: '#f39c12' }}>📋 Follow-up Required</strong>
+                </label>
+                
+                {completeFormData.follow_up_required && (
+                  <>
+                    <div className="form-group">
+                      <label>
+                        <strong>Next Visit Date:</strong>
+                        <DatePicker
+                          selected={completeFormData.next_visit_date ? new Date(completeFormData.next_visit_date) : null}
+                          onChange={(date) => setCompleteFormData({
+                            ...completeFormData,
+                            next_visit_date: date ? date.toLocaleDateString('en-CA') : ''
+                          })}
+                          minDate={new Date()}
+                          dateFormat="yyyy-MM-dd"
+                          placeholderText="Select next visit date"
+                          className="edit-input"
+                        />
+                      </label>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>
+                        <strong>Follow-up Notes:</strong>
+                        <textarea
+                          name="follow_up_notes"
+                          value={completeFormData.follow_up_notes}
+                          onChange={handleCompleteFormChange}
+                          placeholder="Enter reason for follow-up or special instructions..."
+                          rows="3"
+                          className="edit-input"
+                        />
+                      </label>
+                    </div>
+                  </>
+                )}
               </div>
               
               <p style={{ color: '#666', fontSize: '14px', marginTop: '1rem' }}>

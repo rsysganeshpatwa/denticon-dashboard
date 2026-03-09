@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './ProviderDashboard.css';
 
 function ProviderDashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     today_appointments: 0,
     today_scheduled: 0,
     today_completed: 0,
     upcoming_appointments: 0,
-    recent_noshows: 0
+    recent_noshows: 0,
+    followUpPatients: 0
   });
   const [todayAppointments, setTodayAppointments] = useState([]);
+  const [followUpAppointments, setFollowUpAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
@@ -38,6 +42,15 @@ function ProviderDashboard() {
       if (appointmentsResponse.data && appointmentsResponse.data.data) {
         setTodayAppointments(appointmentsResponse.data.data);
       }
+
+      // Fetch completed appointments with follow-up required
+      const completedResponse = await api.get('/provider-portal/appointments?status=completed');
+      if (completedResponse.data && completedResponse.data.data) {
+        const followUps = completedResponse.data.data.filter(apt => apt.follow_up_required);
+        setFollowUpAppointments(followUps);
+        // Update stats with follow-up count
+        setStats(prev => ({ ...prev, followUpPatients: followUps.length }));
+      }
     } catch (error) {
       console.error('Error fetching provider data:', error);
     } finally {
@@ -52,6 +65,25 @@ function ProviderDashboard() {
       minute: '2-digit',
       hour12: true
     });
+  };
+
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const handleFollowUpClick = (appointment) => {
+    // Store patient info in localStorage for filtering on appointments page
+    localStorage.setItem('highlightedPatient', JSON.stringify({
+      id: appointment.patient_id,
+      name: appointment.patient_name
+    }));
+    // Navigate to appointments page
+    navigate('/provider/appointments');
   };
 
   const getStatusClass = (status) => {
@@ -105,7 +137,55 @@ function ProviderDashboard() {
             <p>Completed Today</p>
           </div>
         </div>
+        <div className="stat-card follow-up-stat">
+          <div className="stat-icon">🔔</div>
+          <div className="stat-content">
+            <h3>{stats.followUpPatients}</h3>
+            <p>Follow-up Required</p>
+          </div>
+        </div>
       </div>
+
+      {/* Follow-up Required Section */}
+      {followUpAppointments.length > 0 && (
+        <div className="appointments-section follow-up-section">
+          <h3>
+            <span className="follow-up-badge">🔔</span> Patients Requiring Follow-up
+          </h3>
+          <div className="info-box">
+            <p>📋 Click on any patient card to view and schedule their follow-up appointment</p>
+          </div>
+          <div className="appointments-list">
+            {followUpAppointments.map((appointment) => (
+              <div 
+                key={appointment.id} 
+                className="provider-appointment-card follow-up-required clickable-appointment"
+                onClick={() => handleFollowUpClick(appointment)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="appointment-time">
+                  <span className="time">{formatDate(appointment.next_visit_date)}</span>
+                  <span className="date">Next Visit</span>
+                </div>
+                <div className="appointment-details">
+                  <h4>{appointment.patient_name}</h4>
+                  <p className="appointment-type">Last Visit: {formatDate(appointment.appointment_date)}</p>
+                  {appointment.follow_up_notes && (
+                    <p className="appointment-notes">
+                      <strong>Follow-up Notes:</strong> {appointment.follow_up_notes}
+                    </p>
+                  )}
+                </div>
+                <div className="appointment-status">
+                  <span className="status-badge status-follow-up">
+                    Follow-up Due
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Today's Appointments */}
       <div className="appointments-section">

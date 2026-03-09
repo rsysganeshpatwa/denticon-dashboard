@@ -14,10 +14,12 @@ const Dashboard = () => {
     todayAppointments: 0,
     pendingRequests: 0,
     activeProviders: 0,
-    inactiveProviders: 0
+    inactiveProviders: 0,
+    followUpPatients: 0
   });
   const [appointments, setAppointments] = useState([]);
   const [appointmentRequests, setAppointmentRequests] = useState([]);
+  const [followUpAppointments, setFollowUpAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = useCallback(async () => {
@@ -44,6 +46,11 @@ const Dashboard = () => {
         apt.appointment_date?.startsWith(today) || apt.appointmentDate?.startsWith(today)
       );
 
+      // Filter follow-up required appointments (completed appointments with follow_up_required = true)
+      const followUpRequired = allAppointments.filter(apt => 
+        apt.follow_up_required === true && apt.status === 'completed'
+      );
+
       // Count active and inactive providers
       const activeProviders = allProviders.filter(p => p.is_active === true).length;
       const inactiveProviders = allProviders.filter(p => p.is_active === false).length;
@@ -59,7 +66,8 @@ const Dashboard = () => {
         todayAppointments: todayAppointments.length,
         pendingRequests: pendingRequests,
         activeProviders: activeProviders,
-        inactiveProviders: inactiveProviders
+        inactiveProviders: inactiveProviders,
+        followUpPatients: followUpRequired.length
       });
 
       // Sort appointments by date and time (most recent first) and take top 5
@@ -71,6 +79,7 @@ const Dashboard = () => {
       
       setAppointments(sortedAppointments.slice(0, 5));
       setAppointmentRequests(allRequests.slice(0, 3)); // Already filtered by API
+      setFollowUpAppointments(followUpRequired.slice(0, 5)); // Top 5 follow-ups
       setLoading(false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -115,9 +124,20 @@ const Dashboard = () => {
     navigate('/locations');
   };
 
+  const handleFollowUpClick = (apt) => {
+    // Navigate to appointments page
+    // Store both patient ID and name for better filtering
+    const patientInfo = {
+      id: apt.patient_id || apt.patientId,
+      name: apt.patient_name || apt.patientName || `Patient ID: ${apt.patient_id || apt.patientId}`
+    };
+    localStorage.setItem('highlightPatient', JSON.stringify(patientInfo));
+    navigate('/appointments');
+  };
+
   if (loading) {
     return <div className="loading">Loading dashboard data...</div>;
-  }
+  };
 
   return (
     <div className="dashboard">
@@ -177,6 +197,39 @@ const Dashboard = () => {
               ))
             ) : (
               <p>No appointments available</p>
+            )}
+          </div>
+        </div>
+
+        <div className="recent-section">
+          <h2>🔔 Follow-up Required</h2>
+          <div className="info-box">
+            <small>💡 Click on any patient to view their appointment history and schedule their follow-up</small>
+          </div>
+          <div className="appointment-list">
+            {followUpAppointments.length > 0 ? (
+              followUpAppointments.map(apt => (
+                <div 
+                  key={apt.id} 
+                  className="appointment-item follow-up clickable"
+                  onClick={() => handleFollowUpClick(apt)}
+                  title="Click to schedule follow-up appointment"
+                >
+                  <div className="apt-time">
+                    <div>{apt.next_visit_date ? formatDate(apt.next_visit_date) : 'Not scheduled'}</div>
+                    <small>Last: {formatDate(apt.appointment_date || apt.appointmentDate)}</small>
+                  </div>
+                  <div className="apt-details">
+                    <strong>{apt.patient_name || apt.patientName || `Patient ID: ${apt.patient_id || apt.patientId}`}</strong>
+                    <span>{apt.follow_up_notes || 'Follow-up required'}</span>
+                  </div>
+                  <div className="apt-status follow-up-badge">
+                    Follow-up
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No follow-up appointments pending</p>
             )}
           </div>
         </div>

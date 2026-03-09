@@ -1,0 +1,477 @@
+.user-manual {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.manual-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 15px;
+}
+
+.manual-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 36px;
+}
+
+.manual-header p {
+  margin: 0;
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.manual-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.manual-section {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.manual-section h2 {
+  margin: 0 0 25px 0;
+  color: #333;
+  font-size: 28px;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 10px;
+}
+
+/* Workflow Diagram */
+.workflow-diagram {
+  overflow-x: auto;
+  padding: 20px 0;
+}
+
+.workflow-path {
+  display: flex;
+  align-items: center;
+  min-width: max-content;
+  padding: 20px;
+  gap: 40px;
+}
+
+.workflow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 200px;
+  position: relative;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.node-icon {
+  font-size: 56px;
+  margin-bottom: 15px;
+}
+
+.node-title {
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 8px;
+  color: #333;
+  line-height: 1.3;
+}
+
+.node-role {
+  font-size: 13px;
+  color: #667eea;
+  font-weight: 600;
+  text-align: center;
+  background: white;
+  padding: 5px 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.node-arrow {
+  position: absolute;
+  right: -50px;
+  font-size: 40px;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* Quick Links */
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.quick-link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.quick-link-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+.link-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.link-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.link-path {
+  font-size: 13px;
+  color: #667eea;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 5px;
+}
+
+/* Roles Section */
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.role-card {
+  padding: 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+}
+
+.role-card h3 {
+  margin: 0 0 15px 0;
+  font-size: 24px;
+}
+
+.role-credentials {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.role-credentials strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.role-credentials code {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.role-permissions {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.role-permissions strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.role-permissions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.role-permissions li {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+/* Steps Section */
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.step-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.step-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.step-card.expanded {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.step-icon {
+  font-size: 40px;
+  flex-shrink: 0;
+}
+
+.step-info {
+  flex: 1;
+}
+
+.step-info h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.step-role {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.expand-icon {
+  font-size: 28px;
+  color: #667eea;
+  font-weight: bold;
+  flex-shrink: 0;
+  width: 30px;
+  text-align: center;
+}
+
+.step-description {
+  margin-top: 10px;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.step-details {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.details-section {
+  margin-bottom: 20px;
+}
+
+.details-section h4 {
+  margin: 0 0 12px 0;
+  color: #667eea;
+  font-size: 18px;
+}
+
+.details-section ol {
+  margin: 0;
+  padding-left: 25px;
+}
+
+.details-section li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.screenshot-placeholder {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  border: 2px dashed #ccc;
+}
+
+.next-step {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.next-step p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Tips Section */
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.tip-card {
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.tip-card h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.tip-card ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.tip-card li {
+  margin-bottom: 8px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Troubleshooting Section */
+.troubleshooting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.issue-card {
+  padding: 20px;
+  background: #fff9e6;
+  border-radius: 10px;
+  border-left: 4px solid #ffb300;
+}
+
+.issue-card h3 {
+  margin: 0 0 10px 0;
+  color: #ff8f00;
+  font-size: 18px;
+}
+
+.issue-card p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.issue-card strong {
+  color: #ff6f00;
+}
+
+/* Support Section */
+.support-info {
+  text-align: center;
+}
+
+.support-info > p {
+  margin-bottom: 25px;
+  font-size: 16px;
+  color: #555;
+}
+
+.support-details {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.support-item {
+  padding: 20px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+  min-width: 250px;
+}
+
+.support-item strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .manual-header h1 {
+    font-size: 28px;
+  }
+
+  .manual-header p {
+    font-size: 16px;
+  }
+
+  .manual-section {
+    padding: 20px;
+  }
+
+  .manual-section h2 {
+    font-size: 24px;
+  }
+
+  .workflow-node {
+    min-width: 120px;
+  }
+
+  .node-icon {
+    font-size: 36px;
+  }
+
+  .node-title {
+    font-size: 12px;
+  }
+
+  .roles-grid,
+  .tips-grid,
+  .quick-links-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .support-details {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
