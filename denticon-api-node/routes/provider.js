@@ -262,7 +262,15 @@ router.put('/appointments/:id', async (req, res) => {
     
     try {
         const { id } = req.params;
-        const { diagnosis, treatment, notes, status } = req.body;
+        const { 
+            diagnosis, 
+            treatment, 
+            notes, 
+            status,
+            follow_up_required,
+            next_visit_date,
+            follow_up_notes
+        } = req.body;
         const providerId = req.user.providerId;
 
         await client.query('BEGIN');
@@ -283,17 +291,29 @@ router.put('/appointments/:id', async (req, res) => {
 
         const oldData = checkResult.rows[0];
 
-        // Update appointment with clinical information
+        // Update appointment with clinical information and follow-up data
         const result = await client.query(`
             UPDATE appointments 
             SET diagnosis = $1,
                 treatment = $2,
                 notes = $3,
                 status = $4,
+                follow_up_required = $5,
+                next_visit_date = $6,
+                follow_up_notes = $7,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE id = $5
+            WHERE id = $8
             RETURNING *
-        `, [diagnosis, treatment, notes, status || 'completed', id]);
+        `, [
+            diagnosis, 
+            treatment, 
+            notes, 
+            status || 'completed', 
+            follow_up_required || false,
+            next_visit_date || null,
+            follow_up_notes || null,
+            id
+        ]);
 
         // Log status change to history if status changed
         if (status && status !== oldData.status) {

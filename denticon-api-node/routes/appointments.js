@@ -330,12 +330,33 @@ router.put('/:id', async (req, res) => {
         const values = [];
         let paramIndex = 1;
 
+        // Allowed fields for update (excluding id and timestamps)
+        const allowedFields = [
+            'patient_id', 'provider_id', 'appointment_date', 'appointment_time',
+            'duration', 'room_number', 'appointment_type', 'status', 'notes',
+            'reason', 'diagnosis', 'treatment', 'follow_up_required', 
+            'next_visit_date', 'follow_up_notes', 'created_by'
+        ];
+
         Object.keys(fields).forEach(key => {
-            setClauses.push(`${key} = $${paramIndex++}`);
-            values.push(fields[key]);
+            if (allowedFields.includes(key)) {
+                setClauses.push(`${key} = $${paramIndex++}`);
+                values.push(fields[key]);
+            }
         });
 
+        if (setClauses.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ 
+                statusCode: 400, 
+                message: 'No valid fields to update' 
+            });
+        }
+
         values.push(id);
+
+        console.log('Update query:', `UPDATE appointments SET ${setClauses.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramIndex}`);
+        console.log('Values:', values);
 
         const result = await client.query(`
             UPDATE appointments 

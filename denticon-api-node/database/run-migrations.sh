@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Denticon Database Migration Runner
 # This script runs all pending migrations automatically
@@ -18,20 +18,20 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}================================${NC}"
-echo -e "${GREEN}Denticon Migration Runner${NC}"
-echo -e "${GREEN}================================${NC}\n"
+printf "${GREEN}================================${NC}\n"
+printf "${GREEN}Denticon Migration Runner${NC}\n"
+printf "${GREEN}================================${NC}\n\n"
 
 # Wait for database to be ready
-echo -e "${YELLOW}Waiting for database to be ready...${NC}"
+printf "${YELLOW}Waiting for database to be ready...${NC}\n"
 until PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c '\q' 2>/dev/null; do
   echo "Database is unavailable - sleeping"
   sleep 2
 done
-echo -e "${GREEN}✓ Database is ready!${NC}\n"
+printf "${GREEN}✓ Database is ready!${NC}\n\n"
 
 # Create migrations tracking table if it doesn't exist
-echo -e "${YELLOW}Setting up migrations tracking table...${NC}"
+printf "${YELLOW}Setting up migrations tracking table...${NC}\n"
 PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" <<-EOSQL
   CREATE TABLE IF NOT EXISTS schema_migrations (
     id SERIAL PRIMARY KEY,
@@ -39,24 +39,32 @@ PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" <<-EOSQL
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 EOSQL
-echo -e "${GREEN}✓ Migrations tracking table ready${NC}\n"
+printf "${GREEN}✓ Migrations tracking table ready${NC}\n\n"
 
 # Get list of migration files
 MIGRATION_DIR="$(dirname "$0")"
-MIGRATIONS=($(ls -1 "$MIGRATION_DIR"/migration-*.sql 2>/dev/null | sort))
 
-if [ ${#MIGRATIONS[@]} -eq 0 ]; then
-  echo -e "${YELLOW}No migration files found${NC}"
+# Count migration files
+MIGRATION_COUNT=0
+for f in "$MIGRATION_DIR"/migration-*.sql; do
+  [ -e "$f" ] || continue
+  MIGRATION_COUNT=$((MIGRATION_COUNT + 1))
+done
+
+if [ "$MIGRATION_COUNT" -eq 0 ]; then
+  printf "${YELLOW}No migration files found${NC}\n"
   exit 0
 fi
 
-echo -e "${YELLOW}Found ${#MIGRATIONS[@]} migration file(s)${NC}\n"
+printf "${YELLOW}Found ${MIGRATION_COUNT} migration file(s)${NC}\n\n"
 
 # Run each migration
 APPLIED_COUNT=0
 SKIPPED_COUNT=0
 
-for MIGRATION_FILE in "${MIGRATIONS[@]}"; do
+for MIGRATION_FILE in "$MIGRATION_DIR"/migration-*.sql; do
+  [ -e "$MIGRATION_FILE" ] || continue
+  
   MIGRATION_NAME=$(basename "$MIGRATION_FILE")
   
   # Check if migration has already been applied
@@ -64,30 +72,30 @@ for MIGRATION_FILE in "${MIGRATIONS[@]}"; do
     "SELECT COUNT(*) FROM schema_migrations WHERE migration_name = '$MIGRATION_NAME';")
   
   if [ "$ALREADY_APPLIED" -gt 0 ]; then
-    echo -e "${YELLOW}⊘ Skipping $MIGRATION_NAME (already applied)${NC}"
+    printf "${YELLOW}⊘ Skipping $MIGRATION_NAME (already applied)${NC}\n"
     SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
     continue
   fi
   
-  echo -e "${YELLOW}→ Applying $MIGRATION_NAME...${NC}"
+  printf "${YELLOW}→ Applying $MIGRATION_NAME...${NC}\n"
   
   # Apply the migration
   if PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -f "$MIGRATION_FILE"; then
     # Record the migration as applied
     PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c \
       "INSERT INTO schema_migrations (migration_name) VALUES ('$MIGRATION_NAME');"
-    echo -e "${GREEN}✓ Successfully applied $MIGRATION_NAME${NC}\n"
+    printf "${GREEN}✓ Successfully applied $MIGRATION_NAME${NC}\n\n"
     APPLIED_COUNT=$((APPLIED_COUNT + 1))
   else
-    echo -e "${RED}✗ Failed to apply $MIGRATION_NAME${NC}"
+    printf "${RED}✗ Failed to apply $MIGRATION_NAME${NC}\n"
     exit 1
   fi
 done
 
 # Summary
-echo -e "${GREEN}================================${NC}"
-echo -e "${GREEN}Migration Summary:${NC}"
-echo -e "  Applied: ${GREEN}$APPLIED_COUNT${NC}"
-echo -e "  Skipped: ${YELLOW}$SKIPPED_COUNT${NC}"
-echo -e "  Total: ${#MIGRATIONS[@]}"
-echo -e "${GREEN}================================${NC}"
+printf "${GREEN}================================${NC}\n"
+printf "${GREEN}Migration Summary:${NC}\n"
+printf "  Applied: ${GREEN}${APPLIED_COUNT}${NC}\n"
+printf "  Skipped: ${YELLOW}${SKIPPED_COUNT}${NC}\n"
+printf "  Total: ${MIGRATION_COUNT}\n"
+printf "${GREEN}================================${NC}\n"

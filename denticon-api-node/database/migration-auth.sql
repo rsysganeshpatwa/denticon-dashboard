@@ -21,14 +21,14 @@ ALTER TABLE providers ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(
 ALTER TABLE providers ADD COLUMN IF NOT EXISTS email VARCHAR(255);
 ALTER TABLE providers ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
--- 3. Create admin user (password: admin123 - bcrypt hashed)
--- Hash generated with: bcrypt.hash('admin123', 10)
+-- 3. Create admin user (password: Admin@2026 - bcrypt hashed)
+-- Hash generated with: bcrypt.hash('Admin@2026', 10)
 INSERT INTO users (username, email, password, role, is_active) VALUES
-('admin', 'admin@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'admin', true)
+('admin', 'admin@denticon.com', '$2a$10$FR4ZztwX5XKGobFGF2Yi6.rRxjVKKisW3K8MLNyehLbqSH9epFIW.', 'admin', true)
 ON CONFLICT (username) DO NOTHING;
 
 -- 4. Create provider users and link them
--- Password for all providers: provider123
+-- Password for all providers: Provider@2026
 DO $$
 DECLARE
     user_id_1 INTEGER;
@@ -39,7 +39,7 @@ DECLARE
 BEGIN
     -- Dr. John Smith
     INSERT INTO users (username, email, password, role, is_active) 
-    VALUES ('john.smith', 'john.smith@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'provider', true)
+    VALUES ('john.smith', 'john.smith@denticon.com', '$2a$10$PnPgX8jd6YGCGOlaESPjrOURbcmwaXOYe3/pfq9O3znWShm06fY6O', 'provider', true)
     ON CONFLICT (username) DO NOTHING
     RETURNING id INTO user_id_1;
     
@@ -49,7 +49,7 @@ BEGIN
     
     -- Dr. Sarah Johnson
     INSERT INTO users (username, email, password, role, is_active) 
-    VALUES ('sarah.johnson', 'sarah.johnson@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'provider', true)
+    VALUES ('sarah.johnson', 'sarah.johnson@denticon.com', '$2a$10$PnPgX8jd6YGCGOlaESPjrOURbcmwaXOYe3/pfq9O3znWShm06fY6O', 'provider', true)
     ON CONFLICT (username) DO NOTHING
     RETURNING id INTO user_id_2;
     
@@ -59,7 +59,7 @@ BEGIN
     
     -- Dr. Michael Brown
     INSERT INTO users (username, email, password, role, is_active) 
-    VALUES ('michael.brown', 'michael.brown@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'provider', true)
+    VALUES ('michael.brown', 'michael.brown@denticon.com', '$2a$10$PnPgX8jd6YGCGOlaESPjrOURbcmwaXOYe3/pfq9O3znWShm06fY6O', 'provider', true)
     ON CONFLICT (username) DO NOTHING
     RETURNING id INTO user_id_3;
     
@@ -69,7 +69,7 @@ BEGIN
     
     -- Dr. Emily Davis
     INSERT INTO users (username, email, password, role, is_active) 
-    VALUES ('emily.davis', 'emily.davis@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'provider', true)
+    VALUES ('emily.davis', 'emily.davis@denticon.com', '$2a$10$PnPgX8jd6YGCGOlaESPjrOURbcmwaXOYe3/pfq9O3znWShm06fY6O', 'provider', true)
     ON CONFLICT (username) DO NOTHING
     RETURNING id INTO user_id_4;
     
@@ -79,7 +79,7 @@ BEGIN
     
     -- Dr. David Wilson
     INSERT INTO users (username, email, password, role, is_active) 
-    VALUES ('david.wilson', 'david.wilson@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'provider', true)
+    VALUES ('david.wilson', 'david.wilson@denticon.com', '$2a$10$PnPgX8jd6YGCGOlaESPjrOURbcmwaXOYe3/pfq9O3znWShm06fY6O', 'provider', true)
     ON CONFLICT (username) DO NOTHING
     RETURNING id INTO user_id_5;
     
@@ -88,10 +88,10 @@ BEGIN
     END IF;
 END $$;
 
--- 5. Create front desk users
+-- 5. Create front desk users (password: FrontDesk@2026)
 INSERT INTO users (username, email, password, role, is_active) VALUES
-('receptionist', 'receptionist@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'front_desk', true),
-('frontdesk', 'frontdesk@denticon.com', '$2b$10$rGHrL6YqHZqVqKq5qNqZ0OLVkIuX1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Z1Zu', 'front_desk', true)
+('receptionist', 'receptionist@denticon.com', '$2a$10$PnPgX8jd6YGCGOlaESPjrOURbcmwaXOYe3/pfq9O3znWShm06fY6O', 'front_desk', true),
+('frontdesk', 'frontdesk@denticon.com', '$2a$10$PnPgX8jd6YGCGOlaESPjrOURbcmwaXOYe3/pfq9O3znWShm06fY6O', 'front_desk', true)
 ON CONFLICT (username) DO NOTHING;
 
 -- 6. Create index for faster lookups

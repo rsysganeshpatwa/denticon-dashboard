@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Entrypoint script for Denticon API
 # Runs migrations automatically before starting the server
