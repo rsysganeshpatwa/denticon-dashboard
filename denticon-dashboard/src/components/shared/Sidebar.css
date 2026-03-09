@@ -115,3 +115,10 @@
     justify-content: center;
   }
 }
+
+/* Print styles - hide sidebar when printing */
+@media print {
+  .sidebar {
+    display: none !important;
+  }
+}

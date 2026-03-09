@@ -15,12 +15,14 @@ import Locations from './components/admin/Locations';
 import ApiDocs from './components/admin/ApiDocs';
 import UserManual from './components/admin/UserManual';
 import AppointmentRequests from './components/admin/AppointmentRequests';
+import Reports from './components/admin/Reports';
 
 // Provider Components
 import ProviderDashboard from './components/provider/ProviderDashboard';
 import ProviderAppointments from './components/provider/ProviderAppointments';
 import ProviderPatients from './components/provider/ProviderPatients';
 import ProviderSchedule from './components/provider/ProviderSchedule';
+import ProviderReports from './components/provider/ProviderReports';
 
 // Front Desk Components
 import FrontDeskDashboard from './components/frontdesk/FrontDeskDashboard';
@@ -164,6 +166,11 @@ function App() {
             <UserManual />
           </ProtectedLayout>
         } />
+        <Route path="/reports" element={
+          <ProtectedLayout isLoggedIn={isLoggedIn} activeTab={activeTab} setActiveTab={setActiveTab} handleLogout={handleLogout} user={user}>
+            <Reports />
+          </ProtectedLayout>
+        } />
         <Route path="/share-link" element={
           <ProtectedLayout isLoggedIn={isLoggedIn} activeTab={activeTab} setActiveTab={setActiveTab} handleLogout={handleLogout} user={user}>
             <ShareBookingLink />
@@ -189,6 +196,11 @@ function App() {
         <Route path="/provider/schedule" element={
           <ProtectedLayout isLoggedIn={isLoggedIn} activeTab={activeTab} setActiveTab={setActiveTab} handleLogout={handleLogout} user={user}>
             <ProviderSchedule />
+          </ProtectedLayout>
+        } />
+        <Route path="/provider/reports" element={
+          <ProtectedLayout isLoggedIn={isLoggedIn} activeTab={activeTab} setActiveTab={setActiveTab} handleLogout={handleLogout} user={user}>
+            <ProviderReports />
           </ProtectedLayout>
         } />
 

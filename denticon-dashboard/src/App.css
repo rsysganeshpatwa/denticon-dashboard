@@ -119,3 +119,25 @@
     width: 100%;
   }
 }
+
+/* Print styles */
+@media print {
+  .app-header,
+  .sidebar {
+    display: none !important;
+  }
+
+  .app {
+    display: block !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .content-area {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+}

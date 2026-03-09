@@ -23,7 +23,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         { id: 'dashboard', icon: '📊', label: 'Dashboard', path: '/provider/dashboard' },
         { id: 'appointments', icon: '📅', label: 'My Appointments', path: '/provider/appointments' },
         { id: 'patients', icon: '👥', label: 'My Patients', path: '/provider/patients' },
-        { id: 'schedule', icon: '🗓️', label: 'My Schedule', path: '/provider/schedule' }
+        { id: 'schedule', icon: '🗓️', label: 'My Schedule', path: '/provider/schedule' },
+        { id: 'reports', icon: '📈', label: 'My Reports', path: '/provider/reports' }
       ];
     } else if (user?.role === 'front_desk') {
       return [
@@ -42,6 +43,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         { id: 'appointment-requests', icon: '📋', label: 'Appointment Requests', path: '/appointment-requests', badge: pendingCount },
         { id: 'providers', icon: '👨‍⚕️', label: 'Providers', path: '/providers' },
         { id: 'locations', icon: '📍', label: 'Locations', path: '/locations' },
+        { id: 'reports', icon: '📈', label: 'Reports', path: '/reports' },
         { id: 'share-link', icon: '🔗', label: 'Share Booking Link', path: '/share-link' }
       ];
     }

@@ -26,6 +26,7 @@ const practiceRoutes = require('./routes/practice');
 const locationRoutes = require('./routes/locations');
 const appointmentRequestRoutes = require('./routes/appointmentRequests');
 const providerPortalRoutes = require('./routes/provider');
+const reportsRoutes = require('./routes/reports');
 
 // API base route
 app.get('/api', (req, res) => {
@@ -59,6 +60,7 @@ app.use('/api/Patient', verifyToken, adminOrFrontDesk, patientRoutes); // Admin 
 app.use('/api/Provider', verifyToken, adminOnly, providerRoutes); // Admin only (CRUD on provider records)
 app.use('/api/Appointment', verifyToken, adminOrFrontDesk, appointmentRoutes); // Admin and Front Desk
 app.use('/api/Practice', verifyToken, adminOnly, practiceRoutes); // Admin only
+app.use('/api/reports', reportsRoutes); // Reports (has its own middleware for role-based access)
 
 // Provider Portal routes (provider-specific) - AFTER admin routes
 app.use('/api/provider-portal', providerPortalRoutes); // Has its own middleware inside
